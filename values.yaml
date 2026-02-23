@@ -12,7 +12,8 @@ gateway:
   listeners:
     - name: web
       protocol: HTTP
-      port: 80
+      # Must match Traefik web entryPoint (default 8000 in Helm chart).
+      port: 8000
       allowedRoutesFrom: All
 
 # Optional: create an example HTTPRoute for smoke testing.

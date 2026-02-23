@@ -71,9 +71,9 @@ edgeGateway:
 
 ## Access Log 欄位對照
 - 已預設保留對應 Nginx `main` 的核心欄位：
-  - `request_X-Forwarded-For`
+  - `ClientAddr`（真實 client IP；不輸出整串 `X-Forwarded-For`）
   - `OriginDuration`（對應 upstream response time）
-  - `StartLocal`
+  - `StartLocal`（搭配 `TZ=Asia/Taipei`）
   - `RequestHost` / `RequestMethod` / `RequestPath` / `RequestProtocol`
   - `DownstreamStatus` / `DownstreamContentSize`
   - `request_Referer` / `request_User-Agent`

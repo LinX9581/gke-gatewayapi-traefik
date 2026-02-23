@@ -42,6 +42,24 @@ gatewayClass:
   name: traefik
 ```
 
+## Node Pool 建議
+- `core_nodes` 放平台元件（Traefik / ArgoCD / logging agent）
+- `app_nodes` 放業務服務
+- 目前此 chart 預設會把 Traefik 排到 `core_nodes`：
+
+```yaml
+traefik:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: core_nodes
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: core
+      effect: NoSchedule
+```
+
+若你的 GKE node pool 實際名稱不是 `core_nodes`，請改成實際值。
+
 ## 後續接 ELK
 目前 access log 已輸出到容器標準輸出（JSON）。
 之後只要在叢集接上 log collector（例如 Fluent Bit / Vector / Filebeat）就能轉送到 ELK。

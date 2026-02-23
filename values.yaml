@@ -30,6 +30,19 @@ traefik:
   deployment:
     replicas: 2
 
+  # Schedule Traefik to GKE core node pool by default.
+  # Override these in your own values if node pool names differ.
+  nodeSelector:
+    cloud.google.com/gke-nodepool: core_nodes
+
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: core
+      effect: NoSchedule
+
+  affinity: {}
+
   service:
     type: ClusterIP
 

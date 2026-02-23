@@ -68,3 +68,13 @@ edgeGateway:
 ## 後續接 ELK
 目前 access log 已輸出到容器標準輸出（JSON）。
 之後可接 Fluent Bit / Vector / Filebeat 轉送到 ELK。
+
+## Access Log 欄位對照
+- 已預設保留對應 Nginx `main` 的核心欄位：
+  - `request_X-Forwarded-For`
+  - `OriginDuration`（對應 upstream response time）
+  - `StartLocal`
+  - `RequestHost` / `RequestMethod` / `RequestPath` / `RequestProtocol`
+  - `DownstreamStatus` / `DownstreamContentSize`
+  - `request_Referer` / `request_User-Agent`
+- Traefik 無原生 `upstream_cache_status` 欄位。

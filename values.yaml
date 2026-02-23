@@ -97,11 +97,19 @@ traefik:
   additionalArguments:
     - --ping=true
     - --ping.entryPoint=traefik
+    - --entryPoints.web.forwardedHeaders.insecure=true
     - --accesslog=true
     - --accesslog.format=json
-    - --accesslog.fields.defaultmode=keep
+    - --accesslog.fields.defaultmode=drop
+    - --accesslog.fields.names.StartLocal=keep
+    - --accesslog.fields.names.RequestHost=keep
+    - --accesslog.fields.names.RequestMethod=keep
+    - --accesslog.fields.names.RequestPath=keep
+    - --accesslog.fields.names.RequestProtocol=keep
+    - --accesslog.fields.names.DownstreamStatus=keep
+    - --accesslog.fields.names.DownstreamContentSize=keep
+    - --accesslog.fields.names.OriginDuration=keep
     - --accesslog.fields.headers.defaultmode=drop
+    - --accesslog.fields.headers.names.X-Forwarded-For=keep
     - --accesslog.fields.headers.names.User-Agent=keep
     - --accesslog.fields.headers.names.Referer=keep
-    - --accesslog.fields.headers.names.X-Forwarded-For=keep
-    - --accesslog.fields.headers.names.X-Real-Ip=keep

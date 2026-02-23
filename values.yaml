@@ -106,7 +106,6 @@ traefik:
     - --accesslog.format=json
     - --accesslog.fields.defaultmode=drop
     - --accesslog.fields.names.StartLocal=keep
-    - --accesslog.fields.names.ClientAddr=keep
     - --accesslog.fields.names.RequestHost=keep
     - --accesslog.fields.names.RequestMethod=keep
     - --accesslog.fields.names.RequestPath=keep
@@ -115,5 +114,7 @@ traefik:
     - --accesslog.fields.names.DownstreamContentSize=keep
     - --accesslog.fields.names.OriginDuration=keep
     - --accesslog.fields.headers.defaultmode=drop
+    - --accesslog.fields.headers.names.X-Forwarded-For=keep
+    - --accesslog.fields.headers.names.CF-Connecting-IP=keep
     - --accesslog.fields.headers.names.User-Agent=keep
     - --accesslog.fields.headers.names.Referer=keep

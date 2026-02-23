@@ -1,0 +1,25 @@
+{{- if .Values.exampleRoute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Values.exampleRoute.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+    - name: {{ include "traefik-gatewayapi.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+{{- if .Values.exampleRoute.hostnames }}
+  hostnames:
+{{- range .Values.exampleRoute.hostnames }}
+    - {{ . | quote }}
+{{- end }}
+{{- end }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.exampleRoute.pathPrefix | quote }}
+      backendRefs:
+        - name: {{ .Values.exampleRoute.service.name }}
+          port: {{ .Values.exampleRoute.service.port }}
+{{- end }}

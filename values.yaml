@@ -1,0 +1,57 @@
+namespace:
+  create: true
+
+gatewayClass:
+  create: true
+  name: traefik
+  controllerName: traefik.io/gateway-controller
+
+gateway:
+  enabled: true
+  name: traefik-gateway
+  listeners:
+    - name: web
+      protocol: HTTP
+      port: 80
+      allowedRoutesFrom: All
+
+# Optional: create an example HTTPRoute for smoke testing.
+# Keep disabled in production and let app charts create their own routes.
+exampleRoute:
+  enabled: false
+  name: whoami
+  hostnames: []
+  pathPrefix: /
+  service:
+    name: whoami
+    port: 80
+
+traefik:
+  deployment:
+    replicas: 2
+
+  service:
+    type: ClusterIP
+
+  providers:
+    kubernetesGateway:
+      enabled: true
+    kubernetesCRD:
+      enabled: true
+    kubernetesIngress:
+      enabled: false
+
+  logs:
+    access:
+      enabled: false
+
+  additionalArguments:
+    - --ping=true
+    - --accesslog=true
+    - --accesslog.format=json
+    - --accesslog.fields.defaultmode=keep
+    - --accesslog.fields.headers.defaultmode=drop
+    - --accesslog.fields.headers.names.User-Agent=keep
+    - --accesslog.fields.headers.names.Referer=keep
+    - --accesslog.fields.headers.names.X-Forwarded-For=keep
+    - --accesslog.fields.headers.names.X-Real-Ip=keep

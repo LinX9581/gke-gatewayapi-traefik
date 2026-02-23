@@ -45,8 +45,9 @@ argocd app sync traefik-gatewayapi
 
 ## 重要設定（values.yaml）
 - `gateway.listeners[0].port=8000`：對齊 Traefik `web` entryPoint
-- `traefik.additionalArguments` 需包含 `--ping.entryPoint=web`（給外層健康檢查 `/ping`）
+- `traefik.additionalArguments` 需包含 `--ping.entryPoint=traefik`（配合 Pod readiness probe）
 - `edgeGateway.className=gke-l7-global-external-managed`
+- `edgeGateway.healthCheckPolicy.portSpecification=USE_FIXED_PORT` 且 `port=8080`（外層檢查 Traefik `/ping`）
 - `edgeGateway.tls.secretName=linx-bar-tls`
 - `edgeGateway.route.hostnames=[]`：可填 `nodejs.linx.bar`
 

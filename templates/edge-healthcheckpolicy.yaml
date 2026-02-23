@@ -16,7 +16,10 @@ spec:
       type: HTTP
       httpHealthCheck:
         requestPath: {{ .Values.edgeGateway.healthCheckPolicy.requestPath }}
-        portSpecification: USE_SERVING_PORT
+        portSpecification: {{ .Values.edgeGateway.healthCheckPolicy.portSpecification }}
+{{- if eq .Values.edgeGateway.healthCheckPolicy.portSpecification "USE_FIXED_PORT" }}
+        port: {{ .Values.edgeGateway.healthCheckPolicy.port }}
+{{- end }}
   targetRef:
     group: ""
     kind: Service

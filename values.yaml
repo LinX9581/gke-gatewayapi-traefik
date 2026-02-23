@@ -44,6 +44,8 @@ edgeGateway:
     enabled: true
     name: traefik-service-hc
     requestPath: /ping
+    portSpecification: USE_FIXED_PORT
+    port: 8080
     checkIntervalSec: 5
     timeoutSec: 5
     healthyThreshold: 2
@@ -94,7 +96,7 @@ traefik:
 
   additionalArguments:
     - --ping=true
-    - --ping.entryPoint=web
+    - --ping.entryPoint=traefik
     - --accesslog=true
     - --accesslog.format=json
     - --accesslog.fields.defaultmode=keep

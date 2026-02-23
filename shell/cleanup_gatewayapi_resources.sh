@@ -27,6 +27,7 @@ TLS_SECRET_NAME="${TLS_SECRET_NAME:-linx-bar-tls}"
 info "Deleting edge route resources..."
 kubectl delete httproute edge-to-traefik -n "$EDGE_NAMESPACE" --ignore-not-found
 kubectl delete referencegrant allow-default-httproute-to-traefik-svc -n "$TRAEFIK_NAMESPACE" --ignore-not-found
+kubectl delete referencegrant allow-edge-httproute-to-traefik-svc -n "$TRAEFIK_NAMESPACE" --ignore-not-found
 
 info "Deleting edge gateway + TLS secret..."
 kubectl delete gateway "$EDGE_GATEWAY_NAME" -n "$EDGE_NAMESPACE" --ignore-not-found

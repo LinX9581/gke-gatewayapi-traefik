@@ -1,0 +1,24 @@
+{{- if and .Values.edgeGateway.enabled .Values.edgeGateway.healthCheckPolicy.enabled }}
+{{- $svcNs := include "traefik-gatewayapi.traefikServiceNamespace" . -}}
+{{- $svcName := include "traefik-gatewayapi.traefikServiceName" . -}}
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: {{ .Values.edgeGateway.healthCheckPolicy.name }}
+  namespace: {{ $svcNs }}
+spec:
+  default:
+    checkIntervalSec: {{ .Values.edgeGateway.healthCheckPolicy.checkIntervalSec }}
+    timeoutSec: {{ .Values.edgeGateway.healthCheckPolicy.timeoutSec }}
+    healthyThreshold: {{ .Values.edgeGateway.healthCheckPolicy.healthyThreshold }}
+    unhealthyThreshold: {{ .Values.edgeGateway.healthCheckPolicy.unhealthyThreshold }}
+    config:
+      type: HTTP
+      httpHealthCheck:
+        requestPath: {{ .Values.edgeGateway.healthCheckPolicy.requestPath }}
+        portSpecification: USE_SERVING_PORT
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ $svcName }}
+{{- end }}

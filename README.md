@@ -4,18 +4,29 @@
 
 ## 目標
 - 用 ArgoCD `app create` 直接部署
-- 啟用 Traefik Gateway API provider
+- 內層：Traefik Gateway API
+- 外層：GKE Gateway（80/443 + TLS）轉發到 Traefik
 - 預設開啟 access log（JSON）
-- 保留常用欄位：`User-Agent`、`Referer`、`X-Forwarded-For`、`X-Real-Ip`、client ip（`ClientAddr`）
 
 ## 結構
 - `Chart.yaml`: 主 chart，依賴官方 `traefik` chart
 - `values.yaml`: 唯一 values 檔（ArgoCD 與本地共用）
 - `templates/gatewayclass.yaml`: Traefik GatewayClass
-- `templates/gateway.yaml`: Traefik Gateway
-- `templates/example-httproute.yaml`: 可選範例路由（預設關閉）
+- `templates/gateway.yaml`: Traefik Gateway（內層）
+- `templates/edge-gateway.yaml`: GKE Gateway（外層）
+- `templates/edge-route-to-traefik.yaml`: 外層 HTTPRoute + ReferenceGrant
+- `templates/edge-healthcheckpolicy.yaml`: Traefik Service HealthCheckPolicy
+- `shell/create_tls_secret.sh`: 建立 TLS Secret
+- `shell/cleanup_gatewayapi_resources.sh`: 清理舊資源
 
-## ArgoCD 部署
+## 部署順序
+1. 先建立 TLS Secret（預設放在 `default` namespace）：
+
+```bash
+bash shell/create_tls_secret.sh
+```
+
+2. 再用 ArgoCD 建立/更新 App：
 
 ```bash
 argocd app create "traefik-gatewayapi" \
@@ -26,43 +37,32 @@ argocd app create "traefik-gatewayapi" \
   --upsert
 ```
 
-### 建議變數
-- `PATH_IN_REPO=traefik-template`（若 chart 在 repo root 則用 `.`）
+3. 同步：
 
-## 注意
-- 這個 chart 會建立 cluster-scoped `GatewayClass`（預設 `traefik`）。
-- 若叢集中已存在同名 `GatewayClass` 且由其他 release 管理，請在 values 設定：
+```bash
+argocd app sync traefik-gatewayapi
+```
+
+## 重要設定（values.yaml）
+- `gateway.listeners[0].port=8000`：對齊 Traefik `web` entryPoint
+- `edgeGateway.className=gke-l7-global-external-managed`
+- `edgeGateway.tls.secretName=linx-bar-tls`
+- `edgeGateway.route.hostnames=[]`：可填 `nodejs.linx.bar`
+
+範例：
 
 ```yaml
-gatewayClass:
-  create: false
-  name: traefik
+edgeGateway:
+  route:
+    hostnames:
+      - nodejs.linx.bar
 ```
 
 ## Node Pool 建議
 - `core_nodes` 放平台元件（Traefik / ArgoCD / logging agent）
 - `app_nodes` 放業務服務
-- 目前此 chart 預設會把 Traefik 排到 `core_nodes`：
-
-```yaml
-traefik:
-  nodeSelector:
-    workload: core
-  tolerations:
-    - key: dedicated
-      operator: Equal
-      value: core
-      effect: NoSchedule
-```
-
-若你要綁定到指定 node pool，也可改成：
-
-```yaml
-traefik:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: nownews-terraform-core-pool
-```
+- 目前預設用 `workload=core` + `dedicated=core:NoSchedule` 放 Traefik 到 core 節點
 
 ## 後續接 ELK
 目前 access log 已輸出到容器標準輸出（JSON）。
-之後只要在叢集接上 log collector（例如 Fluent Bit / Vector / Filebeat）就能轉送到 ELK。
+之後可接 Fluent Bit / Vector / Filebeat 轉送到 ELK。

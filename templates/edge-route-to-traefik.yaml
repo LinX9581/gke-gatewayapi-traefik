@@ -1,0 +1,41 @@
+{{- if .Values.edgeGateway.enabled }}
+{{- $svcNs := include "traefik-gatewayapi.traefikServiceNamespace" . -}}
+{{- $svcName := include "traefik-gatewayapi.traefikServiceName" . -}}
+{{- if ne .Values.edgeGateway.namespace $svcNs }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-edge-httproute-to-traefik-svc
+  namespace: {{ $svcNs }}
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: {{ .Values.edgeGateway.namespace }}
+  to:
+    - group: ""
+      kind: Service
+      name: {{ $svcName }}
+---
+{{- end }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Values.edgeGateway.route.name }}
+  namespace: {{ .Values.edgeGateway.namespace }}
+spec:
+  parentRefs:
+    - name: {{ .Values.edgeGateway.name }}
+      namespace: {{ .Values.edgeGateway.namespace }}
+{{- if .Values.edgeGateway.route.hostnames }}
+  hostnames:
+{{- range .Values.edgeGateway.route.hostnames }}
+    - {{ . | quote }}
+{{- end }}
+{{- end }}
+  rules:
+    - backendRefs:
+        - name: {{ $svcName }}
+          namespace: {{ $svcNs }}
+          port: {{ .Values.edgeGateway.traefikService.port }}
+{{- end }}

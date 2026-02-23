@@ -16,6 +16,39 @@ gateway:
       port: 8000
       allowedRoutesFrom: All
 
+# External GKE Gateway (public entrypoint) -> Traefik service
+edgeGateway:
+  enabled: true
+  namespace: default
+  name: app-gateway
+  className: gke-l7-global-external-managed
+
+  tls:
+    # Secret must exist in edgeGateway.namespace
+    # You can create it with shell/create_tls_secret.sh
+    secretName: linx-bar-tls
+
+  route:
+    name: edge-to-traefik
+    # Optional hostnames for edge route, e.g. ["nodejs.linx.bar"]
+    hostnames: []
+
+  traefikService:
+    # Leave empty to use Traefik service default name
+    # (traefik.fullnameOverride if set, otherwise Helm release name)
+    name: ""
+    namespace: ""
+    port: 80
+
+  healthCheckPolicy:
+    enabled: true
+    name: traefik-service-hc
+    requestPath: /ping
+    checkIntervalSec: 5
+    timeoutSec: 5
+    healthyThreshold: 2
+    unhealthyThreshold: 2
+
 # Optional: create an example HTTPRoute for smoke testing.
 # Keep disabled in production and let app charts create their own routes.
 exampleRoute:

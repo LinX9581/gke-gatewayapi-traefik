@@ -47,7 +47,7 @@ gatewayClass:
 ```yaml
 traefik:
   nodeSelector:
-    cloud.google.com/gke-nodepool: core_nodes
+    workload: core
   tolerations:
     - key: dedicated
       operator: Equal
@@ -55,7 +55,13 @@ traefik:
       effect: NoSchedule
 ```
 
-若你的 GKE node pool 實際名稱不是 `core_nodes`，請改成實際值。
+若你要綁定到指定 node pool，也可改成：
+
+```yaml
+traefik:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: nownews-terraform-core-pool
+```
 
 ## 後續接 ELK
 目前 access log 已輸出到容器標準輸出（JSON）。

@@ -10,27 +10,24 @@
 
 ## 結構
 - `Chart.yaml`: 主 chart，依賴官方 `traefik` chart
-- `values.yaml`: 預設值（已啟用 access log）
+- `values.yaml`: 唯一 values 檔（ArgoCD 與本地共用）
 - `templates/gatewayclass.yaml`: Traefik GatewayClass
 - `templates/gateway.yaml`: Traefik Gateway
 - `templates/example-httproute.yaml`: 可選範例路由（預設關閉）
-- `values/argocd-values.yaml`: 給 ArgoCD 的簡潔覆寫範例
 
 ## ArgoCD 部署
 
 ```bash
-argocd app create "$APP_NAME" \
-  --repo "$REPO_URL" \
-  --path "$PATH_IN_REPO" \
+argocd app create "traefik-gatewayapi" \
+  --repo "https://github.com/LinX9581/traefik-gatewayapi" \
+  --path "." \
   --dest-server https://kubernetes.default.svc \
-  --dest-namespace "$NAMESPACE" \
-  --values "$VALUES_FILE" \
+  --dest-namespace "traefik" \
   --upsert
 ```
 
 ### 建議變數
-- `PATH_IN_REPO=traefik-template`
-- `VALUES_FILE=values/argocd-values.yaml`
+- `PATH_IN_REPO=traefik-template`（若 chart 在 repo root 則用 `.`）
 
 ## 注意
 - 這個 chart 會建立 cluster-scoped `GatewayClass`（預設 `traefik`）。

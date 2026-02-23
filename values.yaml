@@ -94,6 +94,7 @@ traefik:
 
   additionalArguments:
     - --ping=true
+    - --ping.entryPoint=web
     - --accesslog=true
     - --accesslog.format=json
     - --accesslog.fields.defaultmode=keep

@@ -73,7 +73,7 @@ traefik:
   # Schedule Traefik to GKE core node pool by default.
   # Override these in your own values if node pool names differ.
   nodeSelector:
-    workload: core
+    workload: system
 
   tolerations:
     - key: dedicated

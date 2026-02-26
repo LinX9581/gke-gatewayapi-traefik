@@ -78,7 +78,7 @@ traefik:
   tolerations:
     - key: dedicated
       operator: Equal
-      value: core
+      value: system
       effect: NoSchedule
 
   affinity: {}

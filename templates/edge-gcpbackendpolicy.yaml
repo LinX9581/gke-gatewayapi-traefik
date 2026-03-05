@@ -1,0 +1,20 @@
+{{- $edge := .Values.edgeGateway | default dict -}}
+{{- $bp := get $edge "backendPolicy" | default dict -}}
+{{- $bpLogging := get $bp "logging" | default dict -}}
+{{- if and ($edge.enabled | default false) ($bp.enabled | default false) }}
+{{- $svcNs := include "traefik-gatewayapi.traefikServiceNamespace" . -}}
+{{- $svcName := include "traefik-gatewayapi.traefikServiceName" . -}}
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: {{ $bp.name | default (printf "%s-backend-policy" $svcName) }}
+  namespace: {{ $svcNs }}
+spec:
+  default:
+    logging:
+      enabled: {{ $bpLogging.enabled | default false }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ $svcName }}
+{{- end }}

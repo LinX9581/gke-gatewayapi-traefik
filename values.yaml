@@ -49,6 +49,14 @@ edgeGateway:
     healthyThreshold: 2
     unhealthyThreshold: 2
 
+  # GKE Gateway LB backend policy for Traefik service
+  backendPolicy:
+    enabled: true
+    # Optional override; default is "<traefik-service-name>-backend-policy"
+    name: ""
+    logging:
+      enabled: false
+
 # Optional: create an example HTTPRoute for smoke testing.
 # Keep disabled in production and let app charts create their own routes.
 exampleRoute:

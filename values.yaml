@@ -127,3 +127,6 @@ traefik:
     - --ping=true
     - --ping.entryPoint=traefik
     - --entryPoints.web.forwardedHeaders.insecure=true
+    - --serversTransport.maxIdleConnsPerHost=800
+    - --serversTransport.forwardingTimeouts.idleConnTimeout=90s
+    - --serversTransport.forwardingTimeouts.responseHeaderTimeout=15s

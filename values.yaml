@@ -70,7 +70,27 @@ exampleRoute:
 
 traefik:
   deployment:
-    replicas: 2
+    replicas: 4
+
+  autoscaling:
+    enabled: true
+    minReplicas: 4
+    maxReplicas: 12
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 60
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
 
   env:
     - name: TZ
@@ -79,13 +99,9 @@ traefik:
   # Schedule Traefik to GKE core node pool by default.
   # Override these in your own values if node pool names differ.
   nodeSelector:
-    workload: system
+    workload: app
 
-  tolerations:
-    - key: dedicated
-      operator: Equal
-      value: system
-      effect: NoSchedule
+  tolerations: []
 
   affinity: {}
 
